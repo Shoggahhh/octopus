@@ -218,3 +218,4 @@ class Octopus:
                 logger.error(f'{self.BRAND}: {ex}')
 
         ftp_server.quit()
+

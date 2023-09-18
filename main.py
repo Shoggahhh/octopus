@@ -58,6 +58,3 @@ if __name__ == '__main__':
 
     # simple_story = Octopus("Simple story")
     # simple_story.get_file_from_yandex('https://disk.yandex.ru/d/hDHeLMp3dW6TRw', 'действующий')
-
-
-
