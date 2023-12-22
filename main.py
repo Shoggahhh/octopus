@@ -12,15 +12,25 @@ if __name__ == '__main__':
     livolo.get_file_from_mailru("https://cloud.mail.ru/public/1ZWJ/4ncMnVjVa", "Прайс лист")
     livolo.transfer_to_ftp()
 
-    arlight = Octopus("Arlight")
-    arlight.auth_and_download_from_link(tag_login='loginUser',
-                                        tag_password='loginPass',
-                                        login=OCTOPUS_SETTINGS.get('ARLIGHT_LOGIN'),
-                                        password=OCTOPUS_SETTINGS.get('ARLIGHT_PASSWORD'),
-                                        base_url='https://assets.transistor.ru/',
-                                        url_to_file='https://assets.transistor.ru/price/v3/sites/price.xlsx'
-                                        )
-    arlight.transfer_to_ftp()
+    rocket_socket = Octopus("Rocket_socket")
+    rocket_socket.get_file_from_mailru("https://cloud.mail.ru/public/1ZWJ/4ncMnVjVa", "Прайс лист")
+    rocket_socket.transfer_to_ftp()
+
+    terneo = Octopus("Terneo")
+    terneo.get_file_from_mailru("https://cloud.mail.ru/public/1ZWJ/4ncMnVjVa", "Прайс лист")
+    terneo.transfer_to_ftp()
+
+
+
+    # arlight = Octopus("Arlight")
+    # arlight.auth_and_download_from_link(tag_login='loginUser',
+    #                                     tag_password='loginPass',
+    #                                     login=OCTOPUS_SETTINGS.get('ARLIGHT_LOGIN'),
+    #                                     password=OCTOPUS_SETTINGS.get('ARLIGHT_PASSWORD'),
+    #                                     base_url='https://assets.transistor.ru/',
+    #                                     url_to_file='https://assets.transistor.ru/price/v3/sites/price.xlsx'
+    #                                     )
+    # arlight.transfer_to_ftp()
 
     camelion = Octopus("Camelion")
     camelion.find_massage_from_outlook('info@e-s-t.ru', 'Остатки товаров на ')
@@ -49,12 +59,21 @@ if __name__ == '__main__':
     # zortes_stock.transfer_to_ftp()
 
     newport_stock = Octopus("Newport_stocks")
-    newport_stock.get_file_from_link("http://178.177.4.229:8787/publ/Остатки NEWPORT.csv")
+    newport_stock.get_file_from_link("http://178.177.4.229:8087/publ/Остатки NEWPORT.csv")
     newport_stock.transfer_to_ftp()
 
     newport_price = Octopus("Newport_price")
     newport_price.get_file_from_link("https://newport-light.ru/Down/price-newport-mrc.xlsx")
     newport_price.transfer_to_ftp()
 
-    # simple_story = Octopus("Simple story")
-    # simple_story.get_file_from_yandex('https://disk.yandex.ru/d/hDHeLMp3dW6TRw', 'действующий')
+    simple_story = Octopus("Simple story")
+    simple_story.get_file_from_yandex('https://disk.yandex.ru/d/hDHeLMp3dW6TRw', 'действующий')
+
+    ovivo = Octopus("Ovivo")
+    # ovivo.get_file_from_mailru("https://cloud.mail.ru/public/mQqu/XEoebtHtX", 'Остатки Овиво')
+    ovivo.get_file_from_yandex(url='https://disk.yandex.ru/d/_YU5JEZnN0oRZQ', file_name='Остатки Овиво')
+    ovivo.transfer_to_ftp()
+
+    leek = Octopus("Leek")
+    leek.find_massage_from_outlook(sender='levashko@leek-lamp.ru', theme_of_message='Остатки товаров на ')
+    leek.transfer_to_ftp()

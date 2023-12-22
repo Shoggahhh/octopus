@@ -169,16 +169,19 @@ class Octopus:
                 zip_file = ZipFile(fln)
                 with ZipFile(zip_file.filename, 'r') as zip_file:
                     list_of_file_names = zip_file.namelist()
+
                     logger.info(f'files from zip: {list_of_file_names}')
+
                     for member in list_of_file_names:
                         if file_name in member:
                             name = os.path.basename(member)
+
                             logger.info(f'name is found: {name}')
 
-                        source = zip_file.open(member)
-                        target = open(os.path.join(f'{self.PATH_TO_FILE}', f'{self.BRAND}.{name.split(".")[-1]}'), 'wb')
-                        with source, target:
-                            shutil.copyfileobj(source, target)
+                            source = zip_file.open(member)
+                            target = open(os.path.join(f'{self.PATH_TO_FILE}', f'{self.BRAND}.{name.split(".")[-1]}'), 'wb')
+                            with source, target:
+                                shutil.copyfileobj(source, target)
         except Exception as ex:
             logger.error(ex)
 
@@ -202,16 +205,15 @@ class Octopus:
         path_to_file = ''
         files = []
         for file in os.listdir(self.PATH_TO_FILE):
-            if self.BRAND == file.split(".")[0]:
+            if self.BRAND == file.split(".")[0] and file.split(".")[-1] != 'zip':
                 path_to_file = f'{self.PATH_TO_FILE}{self.BRAND}.{file.split(".")[-1]}'
                 files.append(path_to_file)
 
         for i in files:
-            file_name = Path(i)
             try:
                 logger.info('transfer file to ftp')
                 with open(path_to_file, "rb") as file:
-                    ftp_server.storbinary(f'STOR {file_name.name}', file)
+                    ftp_server.storbinary(f'STOR {os.path.basename(i)}', file)
                     data = ftplib.FTP.retrlines(ftp_server, 'LIST')
                     logger.info(data)
             except Exception as ex:
