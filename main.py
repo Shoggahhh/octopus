@@ -1,6 +1,6 @@
 from octopus import Octopus
 from settings import OCTOPUS_SETTINGS
-
+from datetime import date
 
 from for_logger import log_this
 
@@ -33,7 +33,7 @@ if __name__ == '__main__':
     # arlight.transfer_to_ftp()
 
     camelion = Octopus("Camelion")
-    camelion.find_massage_from_outlook('info@e-s-t.ru', 'Остатки товаров на ')
+    camelion.find_massage_from_outlook('info@e-s-t.ru', f'Остатки товаров на {date.today().strftime("%d.%m.%Y")}')
     camelion.transfer_to_ftp()
 
     italline = Octopus("Italline")
@@ -47,7 +47,7 @@ if __name__ == '__main__':
     italline.transfer_to_ftp()
 
     ultraflash = Octopus("Ultraflash")
-    ultraflash.find_massage_from_outlook('info@e-s-t.ru', 'Остатки товаров на ')
+    ultraflash.find_massage_from_outlook('info@e-s-t.ru', f'Остатки товаров на {date.today().strftime("%d.%m.%Y")}')
     ultraflash.transfer_to_ftp()
 
     # zortes_stock = Octopus("Zortes_stock")
@@ -75,5 +75,16 @@ if __name__ == '__main__':
     ovivo.transfer_to_ftp()
 
     leek = Octopus("Leek")
-    leek.find_massage_from_outlook(sender='levashko@leek-lamp.ru', theme_of_message='Остатки товаров на ')
+    leek.find_massage_from_outlook('1c8@energoco.ru', 'Остатки складов МФ с ценами')
     leek.transfer_to_ftp()
+
+    brizzy = Octopus("Brizzi")
+    brizzy.get_file_from_google(
+        url='https://docs.google.com/spreadsheets/u/0/d/1o3j5DucKsvX2gPJi21KsZB0sgQEN4J3CB-YzVtSy5YY/export',
+        format_file='xlsx'
+    )
+    brizzy.transfer_to_ftp()
+
+    # kutek = Octopus("Kutek")
+    # kutek.get_file_from_mailru(url='https://cloud.mail.ru/public/FoMy/4Hbh6fNra', name='наличие на')
+    # kutek.transfer_to_ftp()

@@ -3,7 +3,6 @@ import json
 import os
 import shutil
 from datetime import date
-from pathlib import Path
 from urllib.parse import urlencode
 from zipfile import ZipFile
 
@@ -77,21 +76,19 @@ class Octopus:
         # folder = outlook.GetDefaultFolder(6)
 
         messages = sub_folder.Items
+        messages.Sort("[ReceivedTime]", True)
         today_now = date.today()
-        found = 0
         try:
             for message in messages:
-                if message.SenderEmailAddress == sender and message.Subject == f'{theme_of_message}{today_now.strftime("%d.%m.%Y")}':
-                    found += 1
-
+                if message.SenderEmailAddress == sender and message.Subject == theme_of_message and message.ReceivedTime.date() == today_now:
                     logger.info('Message found')
                     logger.info('get attachments')
-
-                    for att in message.Attachments:
-                        att.SaveAsFile(f'{self.PATH_TO_FILE}{self.BRAND}.{str(att).split(".")[-1]}')
-                    logger.info(f'{self.BRAND}: file saved')
-            if found == 0:
-                return logger.error(f'{self.BRAND}: file not found')
+                    try:
+                        for att in message.Attachments:
+                            att.SaveAsFile(f'{self.PATH_TO_FILE}{self.BRAND}.{str(att).split(".")[-1]}')
+                            logger.info(f'{self.BRAND}: file saved')
+                    except Exception as ex:
+                        logger.error(f'{self.BRAND}: file not found')
         except Exception as ex:
             logger.error(f'{self.BRAND}: {ex}')
 
@@ -179,12 +176,28 @@ class Octopus:
                             logger.info(f'name is found: {name}')
 
                             source = zip_file.open(member)
-                            target = open(os.path.join(f'{self.PATH_TO_FILE}', f'{self.BRAND}.{name.split(".")[-1]}'), 'wb')
+                            target = open(os.path.join(f'{self.PATH_TO_FILE}', f'{self.BRAND}.{name.split(".")[-1]}'),
+                                          'wb')
                             with source, target:
                                 shutil.copyfileobj(source, target)
         except Exception as ex:
             logger.error(ex)
 
+    def get_file_from_google(self, url, format_file):
+        logger.info(f'\n{self.BRAND}')
+        try:
+            params = {
+                'format': f'{format_file}',
+            }
+            response = requests.get(url, params=params)
+            response.raise_for_status()
+
+            logger.info(f'status_code: {response.status_code}')
+
+            with open(f'{self.PATH_TO_FILE}{self.BRAND}.{params.get("format")}', 'wb') as f:
+                f.write(response.content)
+        except Exception as ex:
+            logger.error(ex)
 
     def transfer_to_ftp(self):
         ftp_server = ftplib.FTP(self.FTP_HOST, self.FTP_USER, self.FTP_PASSWORD)
@@ -220,4 +233,3 @@ class Octopus:
                 logger.error(f'{self.BRAND}: {ex}')
 
         ftp_server.quit()
-
