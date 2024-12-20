@@ -3,7 +3,7 @@ import json
 import os
 import shutil
 from datetime import date
-from urllib.parse import urlencode
+from urllib.parse import urlencode, quote
 from zipfile import ZipFile
 
 import requests
@@ -142,44 +142,34 @@ class Octopus:
         except requests.exceptions.HTTPError as ex:
             logger.error(ex)
 
-    def get_file_from_yandex(self, url, file_name=None):
+    def get_file_from_yandex(self, url: str, file_name: str, format_file_xlsx: str = None):
         logger.info(f'\n{self.BRAND}')
         format_xlsx = ['xls', 'xlsx', 'csv']
 
-        base_url = 'https://cloud-api.yandex.net/v1/disk/public/resources/download?'
-        public_key = url
+        if format_file_xlsx not in format_xlsx and format_file_xlsx is not None:
+            logger.error("this format file is not excel")
+            raise "this format file is not excel"
 
-        yandex_url = base_url + urlencode(dict(public_key=public_key))
+        base_url = 'https://cloud-api.yandex.net/v1/disk/public/resources?'
+        params = {"public_key": url}
+
+        yandex_url = base_url + urlencode(query=params, safe='/', quote_via=quote)
 
         try:
             response = requests.get(yandex_url)
-            download_url = response.json()['href']
-            format_file = response.json()["href"].split('&')[1].split('.')[-1]
+            data_json = response.json()
+            urls = []
+            for item in data_json["_embedded"]["items"]:
+                name = item["name"]
+                if file_name in name and name.split(".")[-1] == format_file_xlsx:
+                    urls.append(item["file"])
 
-            download_response = requests.get(download_url).content
+            for url_file in urls:
+                file = requests.get(url_file).content
+                path_to_file = f'{self.PATH_TO_FILE}{self.BRAND}.{format_file_xlsx}'
+                with open(path_to_file, 'wb') as f:
+                    f.write(file)
 
-            fln = f'{self.PATH_TO_FILE}{self.BRAND}.{format_file}'
-            with open(fln, 'wb') as f:
-                f.write(download_response)
-
-            if format_file not in format_xlsx:
-                zip_file = ZipFile(fln)
-                with ZipFile(zip_file.filename, 'r') as zip_file:
-                    list_of_file_names = zip_file.namelist()
-
-                    logger.info(f'files from zip: {list_of_file_names}')
-
-                    for member in list_of_file_names:
-                        if file_name in member:
-                            name = os.path.basename(member)
-
-                            logger.info(f'name is found: {name}')
-
-                            source = zip_file.open(member)
-                            target = open(os.path.join(f'{self.PATH_TO_FILE}', f'{self.BRAND}.{name.split(".")[-1]}'),
-                                          'wb')
-                            with source, target:
-                                shutil.copyfileobj(source, target)
         except Exception as ex:
             logger.error(ex)
 

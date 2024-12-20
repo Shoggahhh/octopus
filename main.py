@@ -45,14 +45,6 @@ if __name__ == '__main__':
     ultraflash.find_massage_from_outlook('info@e-s-t.ru', f'Остатки товаров на {date.today().strftime("%d.%m.%Y")}')
     ultraflash.transfer_to_ftp()
 
-    # zortes_stock = Octopus("Zortes_stock")
-    # zortes_stock.get_file_from_yandex('https://disk.yandex.ru/i/vPXlChjshCB4hw')
-    # zortes_stock.transfer_to_ftp()
-    #
-    # zortes_price = Octopus("Zortes_price")
-    # zortes_price.get_file_from_yandex('https://disk.yandex.ru/i/dOiqAYW3rI5iow')
-    # zortes_stock.transfer_to_ftp()
-
     newport_stock = Octopus("Newport_stocks")
     newport_stock.get_file_from_link("http://178.177.4.229:8087/publ/Остатки NEWPORT.csv")
     newport_stock.transfer_to_ftp()
@@ -65,7 +57,6 @@ if __name__ == '__main__':
     simple_story.get_file_from_yandex('https://disk.yandex.ru/d/hDHeLMp3dW6TRw', file_name='действующий')
 
     ovivo = Octopus("Ovivo")
-    # ovivo.get_file_from_mailru("https://cloud.mail.ru/public/mQqu/XEoebtHtX", 'Остатки Овиво')
     ovivo.get_file_from_yandex(url='https://disk.yandex.ru/d/_YU5JEZnN0oRZQ', file_name='Остатки')
     ovivo.transfer_to_ftp()
 
@@ -88,12 +79,14 @@ if __name__ == '__main__':
     apeyron.get_file_from_link("http://storage.aeled.ru/feed_apeyron.yml")
     apeyron.transfer_to_ftp()
 
-    # kutek = Octopus("Kutek")
-    # kutek.get_file_from_mailru(url='https://cloud.mail.ru/public/FoMy/4Hbh6fNra', name='наличие на')
-    # kutek.transfer_to_ftp()
+    arti_lampadari = Octopus("Arti Lampadari")
+    arti_lampadari.get_file_from_yandex("https://disk.yandex.ru/d/sa2zN832OAzAUQ", "Прайс Arti", "xlsx")
+    arti_lampadari.transfer_to_ftp()
 
-    # sferon_brands = ["Прайс Arti Lampadari", "Прайс Dio D'Arte", "Прайс Lucia Tucci"]
-    # sferon = Octopus("Sferon")
-    # sferon.get_all_files_from_yandex("https://disk.yandex.ru/d/sa2zN832OAzAUQ", file_names=sferon_brands,
-    #                                  format_file='xlsx')
-    # sferon.transfer_to_ftp()
+    dio_de_arte = Octopus("Dio D'Arte")
+    dio_de_arte.get_file_from_yandex("https://disk.yandex.ru/d/sa2zN832OAzAUQ", "Прайс Dio", "xlsx")
+    dio_de_arte.transfer_to_ftp()
+
+    lucia_tucci = Octopus("Lucia Tucci")
+    lucia_tucci.get_file_from_yandex("https://disk.yandex.ru/d/sa2zN832OAzAUQ", "Прайс Lucia", "xlsx")
+    lucia_tucci.transfer_to_ftp()
