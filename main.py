@@ -54,7 +54,7 @@ if __name__ == '__main__':
     newport_price.transfer_to_ftp()
 
     simple_story = Octopus("Simple story")
-    simple_story.get_file_from_yandex('https://disk.yandex.ru/d/hDHeLMp3dW6TRw', file_name='действующий')
+    simple_story.get_file_from_yandex('https://disk.yandex.ru/d/hDHeLMp3dW6TRw', file_name='SIMPLE STORY')
 
     ovivo = Octopus("Ovivo")
     ovivo.get_file_from_yandex(url='https://disk.yandex.ru/d/_YU5JEZnN0oRZQ', file_name='Остатки')
@@ -90,3 +90,7 @@ if __name__ == '__main__':
     lucia_tucci = Octopus("Lucia Tucci")
     lucia_tucci.get_file_from_yandex("https://disk.yandex.ru/d/sa2zN832OAzAUQ", "Прайс Lucia", "xlsx")
     lucia_tucci.transfer_to_ftp()
+
+    ambrella_light = Octopus("Ambrella light")
+    ambrella_light.get_file_from_mailru("https://cloud.mail.ru/public/qxqq/ooTLNR8pp", "Прайс")
+    ambrella_light.transfer_to_ftp()

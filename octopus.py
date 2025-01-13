@@ -158,17 +158,38 @@ class Octopus:
         try:
             response = requests.get(yandex_url)
             data_json = response.json()
-            urls = []
-            for item in data_json["_embedded"]["items"]:
-                name = item["name"]
-                if file_name in name and name.split(".")[-1] == format_file_xlsx:
-                    urls.append(item["file"])
+            new_data = {}
+            if data_json.get("_embedded"):
+                data_lst = data_json.get("_embedded").get("items")
+                for item in data_lst:
+                    if item.get("type") == "dir":
+                        continue
+                    name = item.get("name")
+                    url = item.get("file")
+                    new_data[name] = url
+            else:
+                name = data_json.get("name")
+                url = data_json.get("file")
+                new_data[name] = url
 
-            for url_file in urls:
-                file = requests.get(url_file).content
-                path_to_file = f'{self.PATH_TO_FILE}{self.BRAND}.{format_file_xlsx}'
-                with open(path_to_file, 'wb') as f:
-                    f.write(file)
+            path_to_file = f'{self.PATH_TO_FILE}{self.BRAND}'
+            check_name = False
+            for k_name, v_url in new_data.items():
+                if format_file_xlsx is not None:
+                    if file_name in k_name and k_name.split(".")[-1] == format_file_xlsx:
+                        check_name = True
+                        file = requests.get(v_url).content
+                        with open(f"{path_to_file}.{format_file_xlsx}", 'wb') as f:
+                            f.write(file)
+                if format_file_xlsx is None:
+                    if file_name in k_name:
+                        check_name = True
+                        file = requests.get(v_url).content
+                        with open(f"{path_to_file}.{k_name.split('.')[-1]}", 'wb') as f:
+                            f.write(file)
+
+            if check_name is False:
+                logger.error(f'file not found')
 
         except Exception as ex:
             logger.error(ex)
