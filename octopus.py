@@ -3,20 +3,19 @@ import json
 import os
 
 # import shutil
-from datetime import date
+# from datetime import date
 from urllib.parse import urlencode, quote
 
 # from zipfile import ZipFile
 
+from exchangelib import Credentials, Account, DELEGATE, FileAttachment, EWSTimeZone
+
+from datetime import datetime
+from logger import logger
 import requests
-import logging
 from settings import settings
 
-import win32com.client as win32
-
-FORMAT = "%(asctime)s %(clientip)-15s %(user)-8s %(message)s"
-logging.basicConfig(format=FORMAT, filename="logs/logs.log", level=logging.INFO)
-logger = logging.getLogger(__name__)
+# import win32com.client as win32
 
 
 class Octopus:
@@ -27,6 +26,9 @@ class Octopus:
         self.FTP_PASSWORD = settings.octopus_settings.ftp_password
         self.FTP_PATH = settings.octopus_settings.ftp_path
         self.PATH_TO_FILE = settings.octopus_settings.path_to_file
+
+        self.EMAIL = settings.octopus_settings.email
+        self.PASSWORD = settings.octopus_settings.password
 
     def auth_and_download_from_link(
         self,
@@ -102,46 +104,83 @@ class Octopus:
         except Exception as ex:
             logger.error(f"{self.BRAND}: {ex}")
 
-    def find_massage_from_outlook(self, sender: str, theme_of_message: str) -> None:
-        """
-        :param sender:
-        :param theme_of_message:
-        :return:
-
-        Метод для скичавания файла с Outlook
-        Метод работает только на Windows для поиска файла на почте Outlook
-        Чтобы работать с web версией нужно зарегестрировать приложение на Azure
-
-        """
+    def find_massage_from_outlook_exchange(
+        self, sender: str, theme_of_message: str
+    ) -> None:
         logger.info(f"\n{self.BRAND}")
-        outlook = win32.Dispatch("Outlook.Application").GetNamespace("MAPI")
 
-        main_folder = outlook.Folders.Item(2)
-        sub_folder = main_folder.Folders("Входящие").Folders("ОСТАТКИ")
-        # folder = outlook.GetDefaultFolder(6)
+        credentials = Credentials(self.EMAIL, self.PASSWORD)
+        account = Account(
+            primary_smtp_address=self.EMAIL,
+            credentials=credentials,
+            autodiscover=True,
+            access_type=DELEGATE,
+        )
 
-        messages = sub_folder.Items
-        messages.Sort("[ReceivedTime]", True)
-        today_now = date.today()
+        moscow_tz = EWSTimeZone("Europe/Moscow")
+        today_moscow = datetime.now(moscow_tz).date()
+
         try:
-            for message in messages:
-                if (
-                    message.SenderEmailAddress == sender
-                    and message.Subject == theme_of_message
-                    and message.ReceivedTime.date() == today_now
-                ):
-                    logger.info("Message found")
-                    logger.info("get attachments")
-                    try:
-                        for att in message.Attachments:
-                            att.SaveAsFile(
-                                f'{self.PATH_TO_FILE}{self.BRAND}.{str(att).split(".")[-1]}'
-                            )
-                            logger.info(f"{self.BRAND}: file saved")
-                    except Exception as ex:
-                        logger.error(f"{self.BRAND} - {ex}: file not found")
+            for item in account.inbox.filter(
+                sender=sender, subject__contains=theme_of_message
+            ).order_by("-datetime_received"):
+                moscow_received = item.datetime_received.astimezone(moscow_tz)
+                if moscow_received.date() != today_moscow:
+                    continue
+                for att in item.attachments:
+                    if isinstance(att, FileAttachment):
+                        with open(
+                            f"{self.PATH_TO_FILE}/{self.BRAND}.{str(att.name).split('.')[-1]}",
+                            "wb",
+                        ) as f:
+                            f.write(att.content)
+                        logger.info(f"file is saved")
+                    else:
+                        logger.info("file not found")
+                break
         except Exception as ex:
             logger.error(f"{self.BRAND}: {ex}")
+
+    # def find_massage_from_outlook(self, sender: str, theme_of_message: str) -> None:
+    #     """
+    #     :param sender:
+    #     :param theme_of_message:
+    #     :return:
+    #
+    #     Метод для скичавания файла с Outlook
+    #     Метод работает только на Windows для поиска файла на почте Outlook
+    #     Чтобы работать с web версией нужно зарегестрировать приложение на Azure
+    #
+    #     """
+    #     logger.info(f"\n{self.BRAND}")
+    #     outlook = win32.Dispatch("Outlook.Application").GetNamespace("MAPI")
+    #
+    #     main_folder = outlook.Folders.Item(2)
+    #     sub_folder = main_folder.Folders("Входящие").Folders("ОСТАТКИ")
+    #     # folder = outlook.GetDefaultFolder(6)
+    #
+    #     messages = sub_folder.Items
+    #     messages.Sort("[ReceivedTime]", True)
+    #     today_now = date.today()
+    #     try:
+    #         for message in messages:
+    #             if (
+    #                 message.SenderEmailAddress == sender
+    #                 and message.Subject == theme_of_message
+    #                 and message.ReceivedTime.date() == today_now
+    #             ):
+    #                 logger.info("Message found")
+    #                 logger.info("get attachments")
+    #                 try:
+    #                     for att in message.Attachments:
+    #                         att.SaveAsFile(
+    #                             f'{self.PATH_TO_FILE}{self.BRAND}.{str(att).split(".")[-1]}'
+    #                         )
+    #                         logger.info(f"{self.BRAND}: file saved")
+    #                 except Exception as ex:
+    #                     logger.error(f"{self.BRAND} - {ex}: file not found")
+    #     except Exception as ex:
+    #         logger.error(f"{self.BRAND}: {ex}")
 
     def get_file_from_mailru(self, url: str, name: str) -> None:
         """
