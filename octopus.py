@@ -111,6 +111,8 @@ class Octopus:
         :param sender: Отправитель
         :param theme_of_message: Тема письма
         :return:
+
+        Метод для скачивания файла с Outlook
         """
         logger.info(f"\n{self.BRAND}")
 
