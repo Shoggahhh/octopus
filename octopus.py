@@ -107,6 +107,11 @@ class Octopus:
     def find_massage_from_outlook_exchange(
         self, sender: str, theme_of_message: str
     ) -> None:
+        """
+        :param sender: Отправитель
+        :param theme_of_message: Тема письма
+        :return:
+        """
         logger.info(f"\n{self.BRAND}")
 
         credentials = Credentials(self.EMAIL, self.PASSWORD)
@@ -143,8 +148,8 @@ class Octopus:
 
     # def find_massage_from_outlook(self, sender: str, theme_of_message: str) -> None:
     #     """
-    #     :param sender:
-    #     :param theme_of_message:
+    #     :param sender: Отправитель
+    #     :param theme_of_message: Тема письма
     #     :return:
     #
     #     Метод для скичавания файла с Outlook
