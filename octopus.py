@@ -19,7 +19,17 @@ from settings import settings
 
 
 class Octopus:
+    """
+    Класс Octopus предназначен для автоматизации загрузки и передачи файлов
+    с различных источников (сайты, почта, облачные хранилища) и отправки их на FTP-сервер.
+    """
+
     def __init__(self, brand):
+        """
+        Инициализация класса Octopus.
+
+        :param brand: Название бренда (используется для именования файлов и папок)
+        """
         self.BRAND = brand
         self.FTP_HOST = settings.octopus_settings.ftp_host
         self.FTP_USER = settings.octopus_settings.ftp_user
@@ -43,7 +53,7 @@ class Octopus:
         :param tag_login: Имя поля, которое хранится в теге login
         :param tag_password: Имя поля, которое хранится в теге password
         :param login: Логин, который нужно написать в поле login
-        :param password: Пароль, который нужно написать в поле login
+        :param password: Пароль, который нужно написать в поле password
         :param base_url: Страница, где требуется аутентификация
         :param url_to_file: Ссылка до файла, который нужно скачать
         :return:
@@ -109,7 +119,7 @@ class Octopus:
     ) -> None:
         """
         :param sender: Отправитель
-        :param theme_of_message: Тема письма
+        :param theme_of_message: Тема письма (или её часть)
         :return:
 
         Метод для скачивания файла с Outlook
@@ -256,12 +266,12 @@ class Octopus:
             return None
 
     def get_file_from_yandex(
-        self, url: str, file_name: str, format_file_xlsx: str = None
+        self, url: str, file_name: str, format_file_xlsx: str | None = None
     ) -> None:
         """
         :param url: Ссылка на диск
         :param file_name: Имя файла на диске
-        :param format_file_xlsx: Формат файла нужно указать, если есть два файла с одинаковыми названиями
+        :param format_file_xlsx: Формат файла (xls, xlsx, csv), если файлов с таким именем несколько
         :return:
 
         Метод для скачивания файла с yandex диск
