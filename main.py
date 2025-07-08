@@ -17,8 +17,6 @@ if __name__ == "__main__":
 
     my_brand = DownloaderFromYandex("my_brand")
     my_brand.download("some_url", "file_name", "xls")
+    ftp_client.transfer_to_ftp(brand=my_brand.brand)
 
     """
-    my_brand = DownloaderFromYandex("my_brand")
-    my_brand.download("some_url", "file_name", "xls")
-    ftp_client.transfer_to_ftp()
