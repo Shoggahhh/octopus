@@ -13,32 +13,31 @@ class FTPClient:
         ftp_password: str = settings.octopus_settings.ftp_password,
         ftp_path: str = settings.octopus_settings.ftp_path,
     ):
-        self.brand = None
         self.ftp_host = ftp_host
         self.ftp_user = ftp_user
         self.ftp_password = ftp_password
         self.ftp_path = ftp_path
 
-    def transfer_to_ftp(self) -> None:
+    def transfer_to_ftp(self, brand: str) -> None:
         ftp_server = ftplib.FTP(self.ftp_host, self.ftp_user, self.ftp_password)
         ftp_server.encoding = "utf-8"
 
         error_code = ""
         try:
-            ftp_server.cwd(f"{self.ftp_path}{self.brand}")
+            ftp_server.cwd(f"{self.ftp_path}/{brand}")
         except ftplib.all_errors as ex:
             error_code = str(ex).split(None, 1)[0]
             logger.error(ex)
 
         if error_code == "550":
-            logger.info(f"create new directory: {self.ftp_path}{self.brand}")
-            ftp_server.mkd(f"{self.ftp_path}{self.brand}")
-            ftp_server.cwd(f"{self.ftp_path}{self.brand}")
+            logger.info(f"create new directory: {self.ftp_path}{brand}")
+            ftp_server.mkd(f"{self.ftp_path}{brand}")
+            ftp_server.cwd(f"{self.ftp_path}{brand}")
 
         files = []
         for file in os.listdir(settings.octopus_settings.path_to_file):
-            if self.brand == file.split(".")[0] and file.split(".")[-1] != "zip":
-                path_to_file = f'{settings.octopus_settings.path_to_file}{self.brand}.{file.split(".")[-1]}'
+            if brand == file.split(".")[0] and file.split(".")[-1] != "zip":
+                path_to_file = f'{settings.octopus_settings.path_to_file}{brand}.{file.split(".")[-1]}'
                 files.append(path_to_file)
 
         for i in files:
@@ -49,7 +48,7 @@ class FTPClient:
                     data = ftplib.FTP.retrlines(ftp_server, "LIST")
                     logger.info(data)
             except Exception as ex:
-                logger.error(f"{self.brand}: {ex}")
+                logger.error(f"{brand}: {ex}")
 
         ftp_server.quit()
 
