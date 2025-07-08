@@ -2,9 +2,9 @@ import logging
 from pathlib import Path
 
 
-LOGS_DIR = Path("logs")
+LOGS_DIR = Path("../logs")
 LOGS_DIR.mkdir(exist_ok=True)
-FILE_DIR = Path("files")
+FILE_DIR = Path("../files")
 FILE_DIR.mkdir(exist_ok=True)
 
 FORMAT = "%(asctime)s %(levelname)s %(name)s %(message)s"
