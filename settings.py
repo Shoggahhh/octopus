@@ -14,7 +14,7 @@ class OctopusSettings(BaseSettings):
     path_to_file: Path = BASE_DIR / "files"
 
     email: str = "my_email@technolight.ru"
-    password: str = "mypassword"
+    email_password: str = "mypassword"
 
     model_config = SettingsConfigDict(env_file=ENV_FILE, extra="ignore")
 
